@@ -105,7 +105,7 @@ readonly class PacketaApi
 	{
 		if (($result['status'] ?? '') === 'fault') {
 			if ($result['fault'] === 'PacketAttributesFault') {
-				throw new PacketaException('PacketaApi Error: ' . $result['detail']['attributes']['fault']);
+				throw new PacketaException('PacketaApi Error: ' . json_encode($result['detail']['attributes']['fault']));
 			}
 
 			$resultFaultsInfo = [$result['fault'] . ': ' . ($result['string'] ?? 'Unknown error')];
