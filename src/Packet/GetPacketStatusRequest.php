@@ -23,7 +23,7 @@ readonly class GetPacketStatusRequest implements RequestInterface
 	public function jsonSerialize(): array
 	{
 		return [
-			'packet_id' => $this->packetId,
+			'packetId' => $this->packetId,
 		];
 	}
 }
