@@ -9,6 +9,7 @@ use PTB\PacketaApi\Common\PdfResponse;
 use PTB\PacketaApi\Common\RequestInterface;
 use PTB\PacketaApi\Label\GetPacketLabelPdfRequest;
 use PTB\PacketaApi\Label\GetPacketsLabelsPdfRequest;
+use PTB\PacketaApi\Packet\CancelPacketRequest;
 use PTB\PacketaApi\Packet\Enum\PacketStatusEnum;
 use PTB\PacketaApi\Packet\GetPacketStatusRequest;
 use PTB\PacketaApi\Packet\PacketResponse;
@@ -48,6 +49,11 @@ readonly class PacketaApi
 		return $packetStatus;
 	}
 
+	public function cancelPacket(CancelPacketRequest $request): void
+	{
+		$this->sendRequest($request, false);
+	}
+
 	public function getPacketLabelPdf(GetPacketLabelPdfRequest $request): PdfResponse
 	{
 		return PdfResponse::fromArrayResponse(['pdfContent' => $this->sendRequest($request)]);
@@ -58,7 +64,7 @@ readonly class PacketaApi
 		return PdfResponse::fromArrayResponse(['pdfContent' => $this->sendRequest($request)]);
 	}
 
-	private function sendRequest(RequestInterface $request): mixed
+	private function sendRequest(RequestInterface $request, bool $isResultRequired = true): mixed
 	{
 		$xmlArrayData['apiPassword'] = $this->apiKey;
 
@@ -68,9 +74,9 @@ readonly class PacketaApi
 
 		$xmlResponse = $this->post($xmlData);
 		$arrayResult = Xml::XmlToArray($xmlResponse);
-		$this->processResult($arrayResult);
+		$this->processResult($arrayResult, $isResultRequired);
 
-		return $arrayResult['result'];
+		return $arrayResult['result'] ?? null;
 	}
 
 	private function post(string $xml): string
@@ -101,7 +107,7 @@ readonly class PacketaApi
 		throw new PacketaException('PacketaApi Error: Unsuccessful attempt to retrieve data from packeta API.', intval($out[1]));
 	}
 
-	private function processResult(array $result): void
+	private function processResult(array $result, bool $isResultRequired): void
 	{
 		if (($result['status'] ?? '') === 'fault') {
 			if ($result['fault'] === 'PacketAttributesFault') {
@@ -115,7 +121,7 @@ readonly class PacketaApi
 			}
 
 			throw new PacketaException('PacketaApi Error: ' . join('', $resultFaultsInfo));
-		} elseif (isset($result['result']) === false) {
+		} elseif ($isResultRequired && isset($result['result']) === false) {
 			throw new PacketaException('PacketaApi Error: There is no result in the response.');
 		}
 	}
