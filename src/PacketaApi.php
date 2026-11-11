@@ -7,10 +7,13 @@ namespace PTB\PacketaApi;
 use PTB\PacketaApi\Exception\PacketaException;
 use PTB\PacketaApi\Common\PdfResponse;
 use PTB\PacketaApi\Common\RequestInterface;
+use PTB\PacketaApi\Label\GetPacketCourierLabelPdfRequest;
 use PTB\PacketaApi\Label\GetPacketLabelPdfRequest;
 use PTB\PacketaApi\Label\GetPacketsLabelsPdfRequest;
 use PTB\PacketaApi\Packet\CancelPacketRequest;
 use PTB\PacketaApi\Packet\Enum\PacketStatusEnum;
+use PTB\PacketaApi\Packet\GetPacketCourierNumberRequest;
+use PTB\PacketaApi\Packet\PacketCourierNumberResponse;
 use PTB\PacketaApi\Packet\GetPacketStatusRequest;
 use PTB\PacketaApi\Packet\PacketResponse;
 use PTB\PacketaApi\Utils\Xml;
@@ -60,6 +63,16 @@ readonly class PacketaApi
 	}
 
 	public function getPacketsLabelsPdf(GetPacketsLabelsPdfRequest $request): PdfResponse
+	{
+		return PdfResponse::fromArrayResponse(['pdfContent' => $this->sendRequest($request)]);
+	}
+
+	public function getPacketCourierNumber(GetPacketCourierNumberRequest $request): PacketCourierNumberResponse
+	{
+		return PacketCourierNumberResponse::fromArrayResponse($this->sendRequest($request));
+	}
+
+	public function getPacketCourierLabelPdf(GetPacketCourierLabelPdfRequest $request): PdfResponse
 	{
 		return PdfResponse::fromArrayResponse(['pdfContent' => $this->sendRequest($request)]);
 	}

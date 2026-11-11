@@ -15,7 +15,7 @@ readonly class CreatePacketRequest implements RequestInterface
 		/** The Packeta pickup point ID returned from their widget */
 		protected int $addressId,
 		/** The Packeta pickup point code returned from their widget */
-		protected string $carrierPickupPoint,
+		protected ?string $carrierPickupPoint,
 		protected float $value,
 		protected ?float $cod,
 		protected string $currency,
@@ -30,6 +30,10 @@ readonly class CreatePacketRequest implements RequestInterface
 		/** The Packeta senders indication */
 		protected string $eshop,
 		protected bool $adultContent = false,
+		protected ?string $street = null,
+		protected ?string $houseNumber = null,
+		protected ?string $city = null,
+		protected ?string $zip = null,
 	) {
 	}
 
@@ -44,7 +48,6 @@ readonly class CreatePacketRequest implements RequestInterface
 			'packetAttributes' => [
 				'number' => $this->number,
 				'addressId' => $this->addressId,
-				'carrierPickupPoint' => $this->carrierPickupPoint,
 				'value' => $this->value,
 				'currency' => $this->currency,
 				'weight' => $this->weight,
@@ -64,6 +67,20 @@ readonly class CreatePacketRequest implements RequestInterface
 
 		if ($this->cod !== null) {
 			$data['packetAttributes']['cod'] = $this->cod;
+		}
+
+		$optionalAttributes = [
+			'carrierPickupPoint' => $this->carrierPickupPoint,
+			'street' => $this->street,
+			'houseNumber' => $this->houseNumber,
+			'city' => $this->city,
+			'zip' => $this->zip,
+		];
+
+		foreach ($optionalAttributes as $name => $value) {
+			if ($value !== null) {
+				$data['packetAttributes'][$name] = $value;
+			}
 		}
 
 		return $data;
